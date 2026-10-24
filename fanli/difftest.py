@@ -11,6 +11,17 @@ def _norm(x):
     return json.loads(json.dumps(x, default=repr))
 
 
+def _same(a, b):
+    """严格比较：类型不同即不一致，避免 True == 1、4.0 == 4 被误判为一致。"""
+    if type(a) is not type(b):
+        return False
+    if isinstance(a, list):
+        return len(a) == len(b) and all(_same(x, y) for x, y in zip(a, b))
+    if isinstance(a, dict):
+        return a.keys() == b.keys() and all(_same(a[k], b[k]) for k in a)
+    return a == b
+
+
 class _Timeout(BaseException):
     """超时不参与缩减：每次重试都要等满超时，缩减会拖很久，所以直接停止并报告当前输入。"""
 
@@ -33,7 +44,7 @@ def find_counterexample(strat, reference_fn, student_path, func_name, max_exampl
             def prop(args):
                 expected = _norm(reference_fn(*copy.deepcopy(args)))
                 status, actual = runner.call(args)
-                if status == "ok" and actual == expected:
+                if status == "ok" and _same(actual, expected):
                     return
                 if status == "timeout":
                     last.clear()

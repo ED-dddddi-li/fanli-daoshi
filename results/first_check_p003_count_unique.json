@@ -1,7 +1,7 @@
 {
   "problem": "p003_count_unique",
   "strategy_log": [
-    "第 1 次生成: 'st.tuples(st.lists(st.integers(-100, 100), max_size=20))' -> 通过"
+    "未配置 LLM_API_KEY，使用人工输入模板（离线降级）"
   ],
   "records": [
     {
@@ -9,8 +9,8 @@
       "verdict": "wrong",
       "expected_verdict": "wrong",
       "match": true,
-      "strategy_source": "llm:attempt1",
-      "seconds": 0.18,
+      "strategy_source": "template:int_list",
+      "seconds": 0.22,
       "counterexample": {
         "args": [
           [
@@ -23,11 +23,11 @@
         "actual": 2
       },
       "hints": {
-        "L1": "当列表中存在重复元素时，代码会出错。",
-        "L2": "输入 [0, 0] 期望返回 1，实际返回 2，请手动数一数不同值有几个。",
-        "L3": "return len(nums) 只统计元素总数，没有去重，所以重复元素被重复计数。"
+        "L1": "当输入有重复元素、全是 0时，你的代码结果不对。",
+        "L2": "调用 count_unique([0, 0])，期望返回 1，你的代码返回 2。试着手动走一遍。",
+        "L3": "检查变量的初始值，以及处理这类输入的条件分支，看它们在这个反例上是否成立。"
       },
-      "hint_source": "llm",
+      "hint_source": "offline",
       "leak_issues": []
     },
     {
@@ -35,8 +35,8 @@
       "verdict": "wrong",
       "expected_verdict": "wrong",
       "match": true,
-      "strategy_source": "llm:attempt1",
-      "seconds": 0.45,
+      "strategy_source": "template:int_list",
+      "seconds": 0.39,
       "counterexample": {
         "args": [
           []
@@ -50,18 +50,16 @@
         "L2": "调用 count_unique([])，期望返回 0，你的代码返回 -1。试着手动走一遍。",
         "L3": "检查变量的初始值，以及处理这类输入的条件分支，看它们在这个反例上是否成立。"
       },
-      "hint_source": "offline(llm 泄题被拦截)",
-      "leak_issues": [
-        "L3 含参考解原句: returnlen(set(nums))"
-      ]
+      "hint_source": "offline",
+      "leak_issues": []
     },
     {
       "solution": "correct_seen.py",
       "verdict": "correct",
       "expected_verdict": "correct",
       "match": true,
-      "strategy_source": "llm:attempt1",
-      "seconds": 2.84,
+      "strategy_source": "template:int_list",
+      "seconds": 2.6,
       "counterexample": null
     }
   ]

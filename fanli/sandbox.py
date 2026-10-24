@@ -21,7 +21,10 @@ class StudentRunner:
         self._start()
 
     def _start(self):
-        env = dict(os.environ, PYTHONIOENCODING="utf-8")
+        # 白名单环境：学生代码所在的子进程拿不到 LLM 密钥等敏感变量。
+        _SAFE_ENV = ("PATH", "SYSTEMROOT", "WINDIR", "TEMP", "TMP", "LANG", "LC_ALL")
+        env = {k: os.environ[k] for k in _SAFE_ENV if k in os.environ}
+        env["PYTHONIOENCODING"] = "utf-8"
         self.proc = subprocess.Popen(
             [sys.executable, "-I", WORKER, os.path.abspath(self.path), self.func_name],
             stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL,

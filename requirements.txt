@@ -1,3 +1,6 @@
-hypothesis>=6.100
-openai>=1.0
-pytest>=8.0
+# 实测组合 1（开发机）：Python 3.12.3 + Hypothesis 6.170.9 + openai 3.37.0 + pytest 9.1.1
+# 实测组合 2（Windows 复跑机）：Python 3.9 + Hypothesis 6.141.1 + openai 2.48.0 + pytest 8.4.2
+# 下限取两套实测的较低版本；不锁死上限，但跨版本升级后请重跑自测。
+hypothesis>=6.141.1
+openai>=2.48.0
+pytest>=8.4.2

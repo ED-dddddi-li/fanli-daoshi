@@ -1,11 +1,13 @@
-"""真实 LLM 路径复跑（Harbor 追加的验证脚本，不属于原项目骨架）。
+"""开发验证脚本（可选），不是评审入口。
 
-原项目的 fanli/llm.py 从 .env 读明文密钥；本次验证不使用明文密钥，而是把
-llm.chat 换成通过 DeepSeek 连接器（custom.deepseek）发出的调用：凭证由连接
-代理换入，本脚本和密钥互不可见。其余环节（生成器自校验、差分缩减、提示词、
-泄题检查）全部走原项目代码，与在用户电脑上填 .env 后跑 run_first_check.py 等价。
+评审入口是 run_first_check.py：填好 .env 后它自动走 LLM 路径，否则离线运行。
+本脚本只用于开发环境里把 llm.chat 换成另一个调用实现：把环境变量
+DEEPSEEK_CHAT_HELPER 指向一个可执行脚本，该脚本从 stdin 读 JSON
+{"system", "user", "temperature", "model"}，向 stdout 输出 JSON
+{"content", "usage": {"prompt_tokens", "completion_tokens"}}。
+未设置该变量时本脚本直接退出并说明原因。
 
-用法（在项目根目录）：python run_llm_check.py problems/p001_second_largest
+用法（在项目根目录）：DEEPSEEK_CHAT_HELPER=/path/to/helper.py python run_llm_check.py problems/p001_second_largest
 """
 import json
 import os
@@ -16,11 +18,13 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 from fanli import llm  # noqa: E402
 
-HELPER = os.path.expanduser("~/workspace/custom-connectors/custom.deepseek/bin/deepseek_chat.py")
+HELPER = os.environ.get("DEEPSEEK_CHAT_HELPER", "")
+if not HELPER:
+    raise SystemExit("未设置 DEEPSEEK_CHAT_HELPER：本脚本为开发验证用，评审请直接用 run_first_check.py + .env。")
 _totals = {"prompt": 0, "completion": 0, "calls": 0}
 
 
-def chat_via_connector(system, user, temperature=0.2):
+def chat_via_helper(system, user, temperature=0.2):
     payload = {"system": system, "user": user, "temperature": temperature, "model": "deepseek-chat"}
     proc = subprocess.run(
         [sys.executable, HELPER],
@@ -28,7 +32,7 @@ def chat_via_connector(system, user, temperature=0.2):
         capture_output=True, text=True, timeout=180,
     )
     if proc.returncode != 0:
-        raise RuntimeError(f"连接器调用失败: {proc.stderr.strip()[:300]}")
+        raise RuntimeError(f"调用失败: {proc.stderr.strip()[:300]}")
     data = json.loads(proc.stdout)
     usage = data.get("usage") or {}
     _totals["calls"] += 1
@@ -41,7 +45,7 @@ def chat_via_connector(system, user, temperature=0.2):
 
 
 llm.available = lambda: True  # noqa: E731
-llm.chat = chat_via_connector
+llm.chat = chat_via_helper
 llm.model_name = lambda: "deepseek-chat"  # noqa: E731
 
 import run_first_check  # noqa: E402

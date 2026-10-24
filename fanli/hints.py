@@ -44,6 +44,12 @@ def _fmt_args(args):
 def offline_hints(cex, func_name):
     feats = "、".join(_features(cex["args"]))
     call = f"{func_name}({_fmt_args(cex['args'])})"
+    if cex["kind"] == "timeout":
+        return {
+            "L1": "当输入让代码运行时间过长时，你的代码结果不对。",
+            "L2": f"调用 {call} 时运行超时（未缩减），期望返回 {repr(cex['expected'])}。",
+            "L3": "检查循环的退出条件和输入规模，看它在这个反例上是否会一直跑下去。",
+        }
     if cex["kind"] == "error":
         l2 = f"调用 {call} 时程序报错：{cex['actual']}，而期望返回 {repr(cex['expected'])}。"
     else:
@@ -67,11 +73,20 @@ def llm_hints(problem_text, student_code, cex, func_name):
     return {k: str(data[k]) for k in ("L1", "L2", "L3")}
 
 
-def leak_check(hints, reference_code):
-    """返回发现的问题列表；空列表表示通过。"""
+def leak_check(hints, reference_code, student_code=""):
+    """返回发现的问题列表；空列表表示通过。
+
+    规则：参考解逐行去空白后长度不少于 8 字符的行、以及参考解里连续
+    20 字符的片段，出现在提示里即判泄题；但学生代码里已经出现的片段
+    不算（例如学生代码本身就写着 len(set(nums))，提示引用它不等于泄题）。
+    改写后的解法、短于阈值的片段仍可能漏网，本检查只能拦原样照抄。
+    """
     issues = []
+    student_norm = re.sub(r"\s+", "", student_code)
     ref_lines = {re.sub(r"\s+", "", ln) for ln in reference_code.splitlines()}
-    ref_lines = {ln for ln in ref_lines if len(ln) >= 12 and not ln.startswith("#")}
+    ref_lines = {ln for ln in ref_lines if len(ln) >= 8 and not ln.startswith("#")
+                 and ln not in student_norm}
+    ref_norm = re.sub(r"\s+", "", reference_code)
     for level, text in hints.items():
         compact = re.sub(r"\s+", "", text)
         if "```" in text or re.search(r"\bdef\s+\w+\s*\(", text):
@@ -79,18 +94,27 @@ def leak_check(hints, reference_code):
         for ln in ref_lines:
             if ln in compact:
                 issues.append(f"{level} 含参考解原句: {ln}")
+        for start in range(0, max(0, len(ref_norm) - 19), 6):
+            frag = ref_norm[start:start + 20]
+            if frag and frag in compact and frag not in student_norm:
+                issues.append(f"{level} 含参考解连续片段")
+                break
     return issues
 
 
 def make_hints(problem_text, student_code, reference_code, cex, func_name):
-    """返回 (hints, 来源, 泄题问题列表)。LLM 输出泄题时退回离线提示。"""
+    """返回 (hints, 来源, 泄题问题列表, 被拦截的 LLM 原文或 None)。
+
+    LLM 输出泄题时退回离线提示，但被拦截的原文会随运行记录保存，
+    不再像以前那样直接丢弃。
+    """
     if llm.available():
         try:
             hints = llm_hints(problem_text, student_code, cex, func_name)
-            issues = leak_check(hints, reference_code)
+            issues = leak_check(hints, reference_code, student_code)
             if not issues:
-                return hints, "llm", []
-            return offline_hints(cex, func_name), "offline(llm 泄题被拦截)", issues
+                return hints, "llm", [], None
+            return offline_hints(cex, func_name), "offline(llm 泄题被拦截)", issues, hints
         except Exception as e:  # noqa: BLE001
-            return offline_hints(cex, func_name), f"offline(llm 失败: {type(e).__name__})", []
-    return offline_hints(cex, func_name), "offline", []
+            return offline_hints(cex, func_name), f"offline(llm 失败: {type(e).__name__})", [], None
+    return offline_hints(cex, func_name), "offline", [], None

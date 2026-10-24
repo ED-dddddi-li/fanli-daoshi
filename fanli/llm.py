@@ -44,11 +44,13 @@ def chat(system, user, temperature=0.2):
     )
     usage = getattr(resp, "usage", None)
     if usage is not None:
-        _log_usage(usage.prompt_tokens, usage.completion_tokens)
+        # 用量日志同时记录 API 返回的模型名，不只记请求名
+        _log_usage(usage.prompt_tokens, usage.completion_tokens,
+                   getattr(resp, "model", None) or model_name())
     return resp.choices[0].message.content
 
 
-def _log_usage(prompt_tokens, completion_tokens):
+def _log_usage(prompt_tokens, completion_tokens, model=None):
     os.makedirs("results", exist_ok=True)
     with open(os.path.join("results", "token_usage.csv"), "a", encoding="utf-8") as f:
-        f.write(f"{model_name()},{prompt_tokens},{completion_tokens}\n")
+        f.write(f"{model or model_name()},{prompt_tokens},{completion_tokens}\n")

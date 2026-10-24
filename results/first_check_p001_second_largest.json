@@ -10,7 +10,7 @@
       "expected_verdict": "wrong",
       "match": true,
       "strategy_source": "template:int_list",
-      "seconds": 0.19,
+      "seconds": 0.11,
       "counterexample": {
         "args": [
           [
@@ -36,7 +36,7 @@
       "expected_verdict": "wrong",
       "match": true,
       "strategy_source": "template:int_list",
-      "seconds": 0.15,
+      "seconds": 0.17,
       "counterexample": {
         "args": [
           [
@@ -62,7 +62,7 @@
       "expected_verdict": "correct",
       "match": true,
       "strategy_source": "template:int_list",
-      "seconds": 2.67,
+      "seconds": 2.75,
       "counterexample": null
     }
   ]
