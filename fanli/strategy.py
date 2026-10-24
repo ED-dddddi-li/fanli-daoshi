@@ -2,7 +2,7 @@
 import copy
 import re
 
-from hypothesis import HealthCheck, given, settings
+from hypothesis import HealthCheck, Phase, given, settings
 from hypothesis import strategies as st
 
 from . import llm
@@ -37,7 +37,7 @@ def validate(strat, reference_fn, n=200):
     problems = []
 
     @settings(max_examples=n, database=None, deadline=None,
-              suppress_health_check=list(HealthCheck), phases=["generate"])
+              suppress_health_check=list(HealthCheck), phases=(Phase.generate,))
     @given(strat)
     def check(args):
         if not isinstance(args, tuple):
