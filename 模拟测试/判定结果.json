@@ -1,0 +1,68 @@
+{
+  "p001_second_largest": [
+    {
+      "file": "p001_second_largest_a.py",
+      "claude_pred": "correct",
+      "tool_verdict": "correct",
+      "counterexample": null
+    },
+    {
+      "file": "p001_second_largest_b.py",
+      "claude_pred": "wrong",
+      "tool_verdict": "wrong",
+      "counterexample": {
+        "args": [
+          [
+            0,
+            -1
+          ]
+        ],
+        "expected": -1,
+        "kind": "ok",
+        "actual": null
+      }
+    }
+  ],
+  "p002_sum_positive": [
+    {
+      "file": "p002_sum_positive_a.py",
+      "claude_pred": "correct",
+      "tool_verdict": "correct",
+      "counterexample": null
+    },
+    {
+      "file": "p002_sum_positive_b.py",
+      "claude_pred": "wrong",
+      "tool_verdict": "wrong",
+      "counterexample": {
+        "args": [
+          []
+        ],
+        "expected": 0,
+        "kind": "error",
+        "actual": "ValueError: max() iterable argument is empty"
+      }
+    }
+  ],
+  "p003_count_unique": [
+    {
+      "file": "p003_count_unique_a.py",
+      "claude_pred": "correct",
+      "tool_verdict": "correct",
+      "counterexample": null
+    },
+    {
+      "file": "p003_count_unique_b.py",
+      "claude_pred": "wrong",
+      "tool_verdict": "wrong",
+      "counterexample": {
+        "args": [
+          []
+        ],
+        "expected": 0,
+        "kind": "ok",
+        "actual": 1
+      }
+    }
+  ]
+}

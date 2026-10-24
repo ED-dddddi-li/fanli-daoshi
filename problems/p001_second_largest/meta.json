@@ -1,0 +1,11 @@
+{
+  "id": "p001_second_largest",
+  "title": "第二大的不同值",
+  "func_name": "second_largest",
+  "input_template": {"type": "int_list", "min_len": 0, "max_len": 50, "min_value": -1000, "max_value": 1000},
+  "expected_verdicts": {
+    "correct_one_pass.py": "correct",
+    "bug_init_zero.py": "wrong",
+    "bug_no_dedup.py": "wrong"
+  }
+}

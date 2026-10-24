@@ -1,0 +1,69 @@
+{
+  "problem": "p001_second_largest",
+  "strategy_log": [
+    "未配置 LLM_API_KEY，使用人工输入模板（离线降级）"
+  ],
+  "records": [
+    {
+      "solution": "bug_init_zero.py",
+      "verdict": "wrong",
+      "expected_verdict": "wrong",
+      "match": true,
+      "strategy_source": "template:int_list",
+      "seconds": 0.19,
+      "counterexample": {
+        "args": [
+          [
+            0,
+            -1
+          ]
+        ],
+        "expected": -1,
+        "kind": "ok",
+        "actual": 0
+      },
+      "hints": {
+        "L1": "当输入含有负数时，你的代码结果不对。",
+        "L2": "调用 second_largest([0, -1])，期望返回 -1，你的代码返回 0。试着手动走一遍。",
+        "L3": "检查变量的初始值，以及处理这类输入的条件分支，看它们在这个反例上是否成立。"
+      },
+      "hint_source": "offline",
+      "leak_issues": []
+    },
+    {
+      "solution": "bug_no_dedup.py",
+      "verdict": "wrong",
+      "expected_verdict": "wrong",
+      "match": true,
+      "strategy_source": "template:int_list",
+      "seconds": 0.15,
+      "counterexample": {
+        "args": [
+          [
+            0,
+            0
+          ]
+        ],
+        "expected": null,
+        "kind": "ok",
+        "actual": 0
+      },
+      "hints": {
+        "L1": "当输入有重复元素、全是 0时，你的代码结果不对。",
+        "L2": "调用 second_largest([0, 0])，期望返回 None，你的代码返回 0。试着手动走一遍。",
+        "L3": "检查变量的初始值，以及处理这类输入的条件分支，看它们在这个反例上是否成立。"
+      },
+      "hint_source": "offline",
+      "leak_issues": []
+    },
+    {
+      "solution": "correct_one_pass.py",
+      "verdict": "correct",
+      "expected_verdict": "correct",
+      "match": true,
+      "strategy_source": "template:int_list",
+      "seconds": 2.67,
+      "counterexample": null
+    }
+  ]
+}

@@ -1,0 +1,11 @@
+{
+  "id": "p003_count_unique",
+  "title": "不同元素的个数",
+  "func_name": "count_unique",
+  "input_template": {"type": "int_list", "min_len": 0, "max_len": 20, "min_value": -100, "max_value": 100},
+  "expected_verdicts": {
+    "bug_len.py": "wrong",
+    "bug_off_by_one.py": "wrong",
+    "correct_seen.py": "correct"
+  }
+}

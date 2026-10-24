@@ -1,0 +1,6 @@
+.env
+__pycache__/
+.hypothesis/
+.pytest_cache/
+results/token_usage.csv
+.venv/

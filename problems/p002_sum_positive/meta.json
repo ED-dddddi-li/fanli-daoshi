@@ -1,0 +1,11 @@
+{
+  "id": "p002_sum_positive",
+  "title": "正数之和",
+  "func_name": "sum_positive",
+  "input_template": {"type": "int_list", "min_len": 0, "max_len": 20, "min_value": -100, "max_value": 100},
+  "expected_verdicts": {
+    "bug_gt_one.py": "wrong",
+    "bug_sum_all.py": "wrong",
+    "correct_filter.py": "correct"
+  }
+}
